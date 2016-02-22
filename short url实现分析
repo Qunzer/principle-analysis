@@ -1,0 +1,30 @@
+如何提供一个短链（URL shorter）生成服务
+
+定义
+短链：将一个long link URL转化为更短的link， 通过short link 可以重定向到原始的link URL。
+
+如何设计
+生成算法需要保证long url生成的short url是唯一的
+如何保证生成唯一？
+例如，可以使用mysql来存储短链对应的种子生成器
+
+假设使用mysql来存储短链种子的生成器id
+生成算法
+从mysql中拿到唯一id，可以取一批id放到内存中，从内存中取id，等到内存中的id用完之后，再从mysql中取；
+对取到的id进行编码，编码成short link， 需要设计能够编码和解码的算法，使id生成的编码尽可能的短，
+参考：http://www.geeksforgeeks.org/how-to-design-a-tiny-url-or-url-shortener/
+
+如何保证可靠性和生成性能
+使用redis、hbase
+Redis：缓存最近生成的短链以及最近访问的短链（比如最近一个月）
+Hbase：在redis可用时，充当异步的持久化短链的职责；redis不可用时，从hbase查询
+Mysql：提供唯一种子生成，并对生成的短链进行备份
+
+生成流程
+从mysql中获取短链种子id，生成短链；
+将[短链，长链]和[长链，短链]的映射关系放入到redis中；
+异步将短链存入hbase。
+
+查询时
+从redis获取短链；
+不存在从hbase获取短链。
