@@ -1,0 +1,9 @@
+对于logback.xml，如果其不在resources跟目录下该如何自动读取？
+ 
+配置Java的一个系统属性：logback.configurationFile，在该属性中指定配置文件的位置。
+查找配置文件的过程：
+1)首先查找logback.configurationFile，找到了，根据属性查找真正的配置文件
+2)如果没有1)中的这个属性，就会在项目路径去查找logback.groovy
+3)没有找到2)中的文件，就会查找logback-test.xml
+4)没有3)中的文件，查找logback.xml
+5)没有4)中的文件，使用默认的日志配置
